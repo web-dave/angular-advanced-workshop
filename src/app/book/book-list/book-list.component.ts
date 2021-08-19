@@ -3,7 +3,7 @@ import { Store } from '@ngrx/store';
 import { Observable } from 'rxjs';
 import { tap } from 'rxjs/operators';
 import { Book } from '../models';
-import { BookCollectionSlice, bookFeatureName, countAction } from '../store';
+import { countAction } from '../store';
 import { booksSelector } from '../store/book-collection.selectors';
 
 @Component({

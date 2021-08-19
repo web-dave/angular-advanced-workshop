@@ -5,6 +5,7 @@ import { Observable } from 'rxjs';
 import { exhaustMap, filter, switchMap, tap } from 'rxjs/operators';
 import { BookApiService } from '../book-api.service';
 import { Book } from '../models';
+import { deleteBookStart } from '../store';
 import { bookSelector } from '../store/book-collection.selectors';
 
 @Component({
@@ -28,11 +29,6 @@ export class BookDetailComponent {
   }
 
   remove() {
-    this.route.params
-      .pipe(
-        exhaustMap(params => this.service.delete(params.isbn)),
-        tap(() => this.router.navigateByUrl('/'))
-      )
-      .subscribe();
+    this.route.params.pipe(tap(params => this.store.dispatch(deleteBookStart({ bookIsbn: params.isbn })))).subscribe();
   }
 }

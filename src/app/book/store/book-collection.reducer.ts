@@ -1,6 +1,12 @@
 import { createReducer, on } from '@ngrx/store';
-import { count } from 'rxjs/operators';
-import { countAction, createBookStart } from './book-collection.action';
+import {
+  countAction,
+  createBookComplete,
+  createBookStart,
+  deleteBookComplete,
+  loadBooksComplete,
+  updateBookComplete
+} from './book-collection.action';
 import { BookCollectionSlice } from './book-collection.slice';
 
 const initialState: BookCollectionSlice = {
@@ -10,6 +16,21 @@ const initialState: BookCollectionSlice = {
 
 export const bookCollectionReducer = createReducer(
   initialState,
-  on(createBookStart, (state, { book }) => ({ ...state, entities: [...state.entities, book] })),
-  on(countAction, (state, { i }) => ({ ...state, i: state.i + i }))
+
+  on(createBookComplete, (state, { book }) => ({
+    ...state,
+    entities: [...state.entities, book]
+  })),
+
+  on(deleteBookComplete, (state, { bookIsbn }) => ({
+    ...state,
+    entities: state.entities.filter(book => book.isbn !== bookIsbn)
+  })),
+
+  on(loadBooksComplete, (state, { books }) => ({ ...state, entities: books })),
+
+  on(updateBookComplete, (state, { update }) => ({
+    ...state,
+    entities: state.entities.map(book => (book.isbn === update.isbn ? update : book))
+  }))
 );
