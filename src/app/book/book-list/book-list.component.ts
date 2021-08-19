@@ -15,9 +15,6 @@ export class BookListComponent {
   books$: Observable<ReadonlyArray<Book>>;
 
   constructor(private store: Store) {
-    setInterval(() => {
-      store.dispatch(countAction({ i: 2 }));
-    }, 1500);
     this.books$ = this.store.select(booksSelector).pipe(tap(state => console.log(state)));
   }
 }

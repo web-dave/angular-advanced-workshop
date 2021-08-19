@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Store } from '@ngrx/store';
 import { Observable } from 'rxjs';
@@ -11,17 +11,13 @@ import { bookSelector } from '../store/book-collection.selectors';
 @Component({
   selector: 'ws-book-detail',
   styleUrls: ['./book-detail.component.scss'],
-  templateUrl: 'book-detail.component.html'
+  templateUrl: 'book-detail.component.html',
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class BookDetailComponent {
   public book$: Observable<Book>;
 
-  constructor(
-    private router: Router,
-    private route: ActivatedRoute,
-    private service: BookApiService,
-    private store: Store
-  ) {
+  constructor(private route: ActivatedRoute, private store: Store, private cdr: ChangeDetectorRef) {
     this.book$ = this.route.params.pipe(
       switchMap(params => this.store.select(bookSelector(params.isbn))),
       filter((book): book is Book => !!book)
@@ -29,6 +25,8 @@ export class BookDetailComponent {
   }
 
   remove() {
-    this.route.params.pipe(tap(params => this.store.dispatch(deleteBookStart({ bookIsbn: params.isbn })))).subscribe();
+    this.route.params
+      .pipe(tap(params => this.store.dispatch(deleteBookStart({ bookIsbn: params.isbn }))))
+      .subscribe(() => this.cdr.detectChanges());
   }
 }
