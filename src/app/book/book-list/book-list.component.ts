@@ -1,7 +1,10 @@
 import { Component } from '@angular/core';
+import { Store } from '@ngrx/store';
 import { Observable } from 'rxjs';
-import { BookApiService } from '../book-api.service';
+import { tap } from 'rxjs/operators';
 import { Book } from '../models';
+import { BookCollectionSlice, bookFeatureName, countAction } from '../store';
+import { booksSelector } from '../store/book-collection.selectors';
 
 @Component({
   selector: 'ws-book-list',
@@ -9,9 +12,12 @@ import { Book } from '../models';
   templateUrl: 'book-list.component.html'
 })
 export class BookListComponent {
-  books$: Observable<Book[]>;
+  books$: Observable<ReadonlyArray<Book>>;
 
-  constructor(private bookData: BookApiService) {
-    this.books$ = this.bookData.getAll();
+  constructor(private store: Store) {
+    setInterval(() => {
+      store.dispatch(countAction({ i: 2 }));
+    }, 1500);
+    this.books$ = this.store.select(booksSelector).pipe(tap(state => console.log(state)));
   }
 }
