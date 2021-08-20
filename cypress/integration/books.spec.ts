@@ -1,6 +1,8 @@
 describe('Book Collection', () => {
   const isbn = Math.floor(1000000000000 + Math.random() * 900000);
-  before(() => {
+  beforeEach(() => {
+    cy.intercept('GET', 'http://localhost:4730/books', { fixture: 'books' });
+    cy.intercept('POST', 'http://localhost:4730/books').as('POST');
     cy.visit('/');
   });
   context('UI', () => {
@@ -29,11 +31,14 @@ describe('Book Collection', () => {
       cy.get('.mat-raised-button').should('not.be.disabled').click();
       cy.url().should('contain', '/books');
       cy.get(`[ng-reflect-router-link="${isbn}"]`).click();
+      cy.wait('@POST').then(interception => {
+        console.log(interception);
+      });
     });
-    it('should delete Book (' + isbn + ')', () => {
-      cy.request('DELETE', 'http://localhost:4730/books/' + isbn);
-      cy.visit('/');
-      cy.get(`[ng-reflect-router-link="${isbn}"]`).should('not.exist');
-    });
+    // it('should delete Book (' + isbn + ')', () => {
+    //   cy.request('DELETE', 'http://localhost:4730/books/' + isbn);
+    //   cy.visit('/');
+    //   cy.get(`[ng-reflect-router-link="${isbn}"]`).should('not.exist');
+    // });
   });
 });
