@@ -1,12 +1,12 @@
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component } from '@angular/core';
-import { ActivatedRoute, Router } from '@angular/router';
+import { ActivatedRoute } from '@angular/router';
 import { Store } from '@ngrx/store';
 import { Observable } from 'rxjs';
-import { exhaustMap, filter, switchMap, tap } from 'rxjs/operators';
-import { BookApiService } from '../book-api.service';
+import { filter, tap } from 'rxjs/operators';
 import { Book } from '../models';
 import { deleteBookStart } from '../store';
 import { bookSelector } from '../store/book-collection.selectors';
+import { selectRouteParam } from '../store/router.selectors';
 
 @Component({
   selector: 'ws-book-detail',
@@ -17,16 +17,11 @@ import { bookSelector } from '../store/book-collection.selectors';
 export class BookDetailComponent {
   public book$: Observable<Book>;
 
-  constructor(private route: ActivatedRoute, private store: Store, private cdr: ChangeDetectorRef) {
-    this.book$ = this.route.params.pipe(
-      switchMap(params => this.store.select(bookSelector(params.isbn))),
-      filter((book): book is Book => !!book)
-    );
+  constructor(private store: Store) {
+    this.book$ = this.store.select(bookSelector).pipe(filter((book): book is Book => !!book));
   }
 
   remove() {
-    this.route.params
-      .pipe(tap(params => this.store.dispatch(deleteBookStart({ bookIsbn: params.isbn }))))
-      .subscribe(() => this.cdr.detectChanges());
+    this.store.dispatch(deleteBookStart());
   }
 }
