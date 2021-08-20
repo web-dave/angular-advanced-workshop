@@ -1,4 +1,6 @@
+import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { By } from '@angular/platform-browser';
 
 import { BookCardComponent } from './book-card.component';
 
@@ -8,7 +10,8 @@ describe('BookCardComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [BookCardComponent]
+      declarations: [BookCardComponent],
+      schemas: [CUSTOM_ELEMENTS_SCHEMA]
     }).compileComponents();
   });
 
@@ -35,6 +38,10 @@ describe('BookCardComponent', () => {
           numPages: 0,
           publisher: { name: 'n/a', url: 'n/a' }
         });
+        component.content.title = 'Hello Bernd';
+        fixture.detectChanges();
+        const view = fixture.debugElement.nativeElement as HTMLElement;
+        expect(view.innerText).toContain('Hello Bernd');
       });
     });
   });
