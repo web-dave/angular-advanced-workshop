@@ -28,6 +28,8 @@ describe('Book Collection', () => {
       cy.get('[formControlName="isbn"').type(`${isbn}`);
       cy.get('[formControlName="title"').type('Hey ' + isbn);
       cy.get('[formControlName="author"').type('Dude');
+
+      cy.screenshot('Form');
       cy.get('.mat-raised-button').should('not.be.disabled').click();
       cy.url().should('contain', '/books');
       cy.get(`[ng-reflect-router-link="${isbn}"]`).click();
