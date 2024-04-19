@@ -1,5 +1,12 @@
 import { Component, DestroyRef } from '@angular/core';
-import { FormBuilder, FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import {
+  FormBuilder,
+  FormControl,
+  FormGroup,
+  NonNullableFormBuilder,
+  ReactiveFormsModule,
+  Validators
+} from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 import { tap } from 'rxjs/operators';
 import { BookApiService } from '../book-api.service';
@@ -11,12 +18,12 @@ import { MatError, MatFormField } from '@angular/material/form-field';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 interface IBookForm {
-  title: FormControl<string | null>;
-  subtitle: FormControl<string | null>;
-  author: FormControl<string | null>;
-  abstract: FormControl<string | null>;
-  isbn: FormControl<string | null>;
-  cover: FormControl<string | null>;
+  title: FormControl<string>;
+  subtitle: FormControl<string>;
+  author: FormControl<string>;
+  abstract: FormControl<string>;
+  isbn: FormControl<string>;
+  cover: FormControl<string>;
 }
 
 @Component({
@@ -37,7 +44,7 @@ export class BookNewComponent {
   });
 
   constructor(
-    private readonly formBuilder: FormBuilder,
+    private readonly formBuilder: NonNullableFormBuilder,
     private readonly router: Router,
     private readonly bookService: BookApiService,
     private readonly destroyRef: DestroyRef
@@ -46,7 +53,7 @@ export class BookNewComponent {
   }
 
   create() {
-    const book = { ...bookNa(), ...this.form.getRawValue() } as Book;
+    const book: Book = { ...bookNa(), ...this.form.getRawValue() };
     this.bookService
       .create(book)
       .pipe(
