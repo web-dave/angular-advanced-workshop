@@ -21,13 +21,23 @@
     <mat-label>Subtitle</mat-label>
     <input matInput formControlName="subtitle" placeholder="Subtitle" />
   </mat-form-field>
-  <mat-form-field>
-    <mat-label>Author</mat-label>
-    <input matInput formControlName="author" placeholder="Author" />
-    @if (form.hasError('required', 'author')) {
-      <mat-error> Author is required </mat-error>
+  <ng-container formArrayName="authors">
+    @for (author of authors.controls; track $index) {
+      <mat-form-field>
+        @if ($first) {
+          <mat-label>Author</mat-label>
+        }
+        <input matInput [formControl]="author" placeholder="Author" />
+        @if (author.getError('memo')) {
+          <mat-error> {{ author.getError('memo') }} </mat-error>
+        }
+        <mat-icon class="delete-btn" (click)="deleteAuthor($index)"> delete_forever </mat-icon>
+      </mat-form-field>
     }
-  </mat-form-field>
+    <button type="button" mat-mini-fab (click)="addAuthor()">
+      <mat-icon class="add-course-btn">add</mat-icon>
+    </button>
+  </ng-container>
   <mat-form-field>
     <mat-label>Abstract</mat-label>
     <textarea matInput formControlName="abstract" placeholder="Abstract"></textarea>
