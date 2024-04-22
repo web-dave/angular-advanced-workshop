@@ -46,6 +46,10 @@
     <mat-label>Cover</mat-label>
     <input matInput formControlName="cover" placeholder="Cover URL" />
   </mat-form-field>
+  <!-- <mat-form-field> -->
+  <button type="button" (click)="disableRating()">Disable</button>
+  <book-rating formControlName="rating" />
+  <!-- </mat-form-field> -->
 
   <div class="form-actions">
     <button mat-button routerLink="/" type="button">Cancel</button>
@@ -67,3 +71,5 @@
     }
   } -->
 </form>
+
+<pre>{{ form.value | json }}</pre>

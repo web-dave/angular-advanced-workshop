@@ -6,6 +6,7 @@ import {
   FormBuilder,
   FormControl,
   FormGroup,
+  NG_VALUE_ACCESSOR,
   NonNullableFormBuilder,
   ReactiveFormsModule,
   ValidationErrors,
@@ -17,12 +18,13 @@ import { catchError, debounceTime, delay, filter, map, switchMap, take, tap, thr
 import { BookApiService } from '../book-api.service';
 import { Book, bookNa } from '../models';
 import { MatButton } from '@angular/material/button';
-import { NgIf } from '@angular/common';
+import { JsonPipe, NgIf } from '@angular/common';
 import { MatInput, MatLabel } from '@angular/material/input';
 import { MatError, MatFormField } from '@angular/material/form-field';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { MatIconModule } from '@angular/material/icon';
 import { Observable, of, timer } from 'rxjs';
+import { RatingComponent } from '../rating.component';
 
 interface IBookForm {
   title: FormControl<string>;
@@ -32,6 +34,7 @@ interface IBookForm {
   abstract: FormControl<string>;
   isbn: FormControl<string>;
   cover: FormControl<string>;
+  rating: FormControl<number>;
 }
 
 const authorValidator: ValidatorFn = (control: AbstractControl): ValidationErrors | null => {
@@ -75,7 +78,19 @@ const isbn = (): AsyncValidatorFn => {
   styleUrls: ['./book-new.component.scss'],
   templateUrl: './book-new.component.html',
   standalone: true,
-  imports: [ReactiveFormsModule, MatFormField, MatInput, MatError, MatButton, RouterLink, MatLabel, MatIconModule]
+
+  imports: [
+    ReactiveFormsModule,
+    MatFormField,
+    MatInput,
+    MatError,
+    MatButton,
+    RouterLink,
+    MatLabel,
+    MatIconModule,
+    RatingComponent,
+    JsonPipe
+  ]
 })
 export class BookNewComponent {
   private readonly formBuilder = inject(NonNullableFormBuilder);
@@ -89,7 +104,8 @@ export class BookNewComponent {
     authors: this.formBuilder.array([] as string[]),
     abstract: ['Foooooo'],
     isbn: ['', [Validators.required, Validators.minLength(3)], [isbn()]],
-    cover: ['']
+    cover: [''],
+    rating: [7]
   });
 
   get authors(): FormArray<FormControl<string>> {
@@ -122,5 +138,9 @@ export class BookNewComponent {
         tap(() => this.router.navigateByUrl('/'))
       )
       .subscribe();
+  }
+
+  disableRating() {
+    this.form.controls.rating.disabled ? this.form.controls.rating.enable() : this.form.controls.rating.disable();
   }
 }
