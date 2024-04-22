@@ -1,6 +1,7 @@
-import { Component, DestroyRef } from '@angular/core';
+import { Component, DestroyRef, inject } from '@angular/core';
 import {
   AbstractControl,
+  AsyncValidatorFn,
   FormArray,
   FormBuilder,
   FormControl,
@@ -8,10 +9,11 @@ import {
   NonNullableFormBuilder,
   ReactiveFormsModule,
   ValidationErrors,
+  ValidatorFn,
   Validators
 } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
-import { tap } from 'rxjs/operators';
+import { catchError, debounceTime, delay, filter, map, switchMap, take, tap, throttleTime } from 'rxjs/operators';
 import { BookApiService } from '../book-api.service';
 import { Book, bookNa } from '../models';
 import { MatButton } from '@angular/material/button';
@@ -20,6 +22,7 @@ import { MatInput, MatLabel } from '@angular/material/input';
 import { MatError, MatFormField } from '@angular/material/form-field';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { MatIconModule } from '@angular/material/icon';
+import { Observable, of, timer } from 'rxjs';
 
 interface IBookForm {
   title: FormControl<string>;
@@ -31,8 +34,40 @@ interface IBookForm {
   cover: FormControl<string>;
 }
 
-const authorValidator = (control: AbstractControl): ValidationErrors | null => {
+const authorValidator: ValidatorFn = (control: AbstractControl): ValidationErrors | null => {
   return control.value === 'Memo' || control.value === 'Simon' ? null : { memo: 'Nur Memo oder Simon ist OK' };
+};
+
+const isbn = (): AsyncValidatorFn => {
+  const service = inject(BookApiService);
+
+  return (control: AbstractControl): Observable<ValidationErrors | null> => {
+    // return of(control.value).pipe(
+    //   delay(1000),
+    //   switchMap(isbnVersuch =>
+    //     service.getByIsbn(isbnVersuch).pipe(
+    //       map(book => ({ isbn: `Isbn wir schon verwendet fuer: ${book.title}` })),
+    //       catchError(() => of(null))
+    //     )
+    //   )
+    // );
+
+    return timer(500).pipe(
+      switchMap(() =>
+        service.getByIsbn(control.value).pipe(
+          map(book => ({ isbn: `Isbn wir schon verwendet fuer: ${book.title}` })),
+          catchError(() => of(null))
+        )
+      )
+    );
+
+    // return timer(10, 500).pipe(
+    //   map(i => i % 2 === 0),
+    //   map(valid => (valid ? null : { isbn: `Isbn wir schon verwendet ` })),
+    //   tap(data => console.log(data)),
+    //   take(2)
+    // );
+  };
 };
 
 @Component({
@@ -43,12 +78,17 @@ const authorValidator = (control: AbstractControl): ValidationErrors | null => {
   imports: [ReactiveFormsModule, MatFormField, MatInput, MatError, MatButton, RouterLink, MatLabel, MatIconModule]
 })
 export class BookNewComponent {
+  private readonly formBuilder = inject(NonNullableFormBuilder);
+  private readonly router = inject(Router);
+  private readonly bookService = inject(BookApiService);
+  private readonly destroyRef = inject(DestroyRef);
+
   protected form: FormGroup<IBookForm> = this.formBuilder.group({
-    title: ['', [Validators.required]],
+    title: ['Das Buch', [Validators.required]],
     subtitle: [''],
     authors: this.formBuilder.array([] as string[]),
-    abstract: [''],
-    isbn: ['', [Validators.required, Validators.minLength(3), authorValidator]],
+    abstract: ['Foooooo'],
+    isbn: ['', [Validators.required, Validators.minLength(3)], [isbn()]],
     cover: ['']
   });
 
@@ -57,20 +97,20 @@ export class BookNewComponent {
   }
 
   addAuthor() {
-    this.authors.push(new FormControl('', { nonNullable: true, validators: [authorValidator] }));
+    this.authors.push(new FormControl('', { nonNullable: true, validators: [authorValidator], asyncValidators: [] }));
   }
 
   deleteAuthor(i: number) {
     this.authors.removeAt(i);
   }
 
-  constructor(
-    private readonly formBuilder: NonNullableFormBuilder,
-    private readonly router: Router,
-    private readonly bookService: BookApiService,
-    private readonly destroyRef: DestroyRef
-  ) {
+  constructor() {
+    // private readonly destroyRef: DestroyRef // private readonly bookService: BookApiService, // private readonly router: Router, // private readonly formBuilder: NonNullableFormBuilder,
+    console.log(this.form.value);
+    this.form.controls.abstract.disable();
+    console.log(this.form.value);
     const f = this.form.getRawValue();
+    console.log(f);
   }
 
   create() {
