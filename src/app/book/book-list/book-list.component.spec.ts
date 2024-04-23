@@ -9,7 +9,7 @@ import { of } from 'rxjs';
 import { ActivatedRoute } from '@angular/router';
 import { BookCardComponent } from '../book-card/book-card.component';
 
-const books: Book[] = [
+export const books: Book[] = [
   {
     id: '1001606140805',
     title: 'Java Web Scraping Handbook',
