@@ -38,14 +38,14 @@ const books: Book[] = [
   }
 ];
 
-// @Component({
-//   selector: 'ws-book-card',
-//   template: '{{content.title}}',
-//   standalone: true
-// })
-// class foo {
-//   @Input() content: any;
-// }
+@Component({
+  selector: 'ws-book-card',
+  template: '{{content.title}}',
+  standalone: true
+})
+class foo {
+  @Input() content: any;
+}
 
 describe('BookListComponent', () => {
   let component: BookListComponent;
@@ -57,19 +57,20 @@ describe('BookListComponent', () => {
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      imports: [BookListComponent, NgFor, AsyncPipe],
+      imports: [BookListComponent],
       providers: [
         {
           provide: BookApiService,
           useValue: bookApiMock
-        },
-        {
-          provide: ActivatedRoute,
-          useValue: {}
         }
       ],
       schemas: [NO_ERRORS_SCHEMA]
-    }).compileComponents();
+    })
+      .overrideComponent(BookListComponent, {
+        remove: { imports: [BookCardComponent] },
+        add: { imports: [foo] }
+      })
+      .compileComponents();
     fixture = TestBed.createComponent(BookListComponent);
     component = fixture.componentInstance;
     view = fixture.nativeElement;
@@ -82,5 +83,6 @@ describe('BookListComponent', () => {
 
   it('should render two Books', () => {
     expect(view.querySelectorAll('ws-book-card').length).toBe(2);
+    expect(view.querySelector('ws-book-card')?.textContent).toBe(books[0].title);
   });
 });
