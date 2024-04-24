@@ -1,4 +1,3 @@
-import { HttpTestingController } from '@angular/common/http/testing';
 import { BookApiService } from './book-api.service';
 import { firstValueFrom } from 'rxjs';
 import { books } from './book-list/book-list.component.spec';
