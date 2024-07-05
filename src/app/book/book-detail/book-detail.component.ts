@@ -1,4 +1,4 @@
-import { Component, DestroyRef, Input } from '@angular/core';
+import { Component, DestroyRef, effect, inject, input, signal, untracked } from '@angular/core';
 import { Router, RouterLink } from '@angular/router';
 import { Observable } from 'rxjs';
 import { tap } from 'rxjs/operators';
@@ -34,25 +34,36 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
     MatCardContent,
     MatCardActions,
     MatButton,
-    RouterLink,
-    AsyncPipe
+    RouterLink
   ]
 })
 export class BookDetailComponent {
+  isbn = input.required<string>();
+  $book = signal<Book | undefined>(undefined);
+
+  effectRef = effect(() => {
+    this.bookService
+      .getByIsbn(this.isbn())
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe(data => this.$book.set(data));
+
+    untracked(() => {
+      // Signals here won't be counted as dependencies of this effect.
+    });
+  });
+
+  // @Input({ required: true })
+  // set isbn(isbn: string) {
+  //   this.book$ = this.bookService.getByIsbn(isbn);
+  //   this.isbnValue = isbn;
+  // }
+
   protected book$?: Observable<Book>;
   private isbnValue = '';
 
-  constructor(
-    private readonly router: Router,
-    private readonly bookService: BookApiService,
-    private readonly destroyRef: DestroyRef
-  ) {}
-
-  @Input({ required: true })
-  set isbn(isbn: string) {
-    this.book$ = this.bookService.getByIsbn(isbn);
-    this.isbnValue = isbn;
-  }
+  private readonly router = inject(Router);
+  private readonly bookService = inject(BookApiService);
+  private readonly destroyRef = inject(DestroyRef);
 
   remove() {
     this.bookService
