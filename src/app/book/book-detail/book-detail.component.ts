@@ -47,6 +47,7 @@ export class BookDetailComponent {
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe(data => this.$book.set(data));
 
+    // https://angular.dev/guide/signals#reading-without-tracking-dependencies
     untracked(() => {
       // Signals here won't be counted as dependencies of this effect.
     });
