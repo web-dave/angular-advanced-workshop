@@ -1,5 +1,5 @@
 import { Component, DestroyRef } from '@angular/core';
-import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
+import { FormBuilder, FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 import { tap } from 'rxjs/operators';
 import { BookApiService } from '../book-api.service';
@@ -10,6 +10,15 @@ import { MatInput, MatLabel } from '@angular/material/input';
 import { MatError, MatFormField } from '@angular/material/form-field';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
+interface INewBockForm {
+  title: FormControl<string>;
+  subtitle: FormControl<string>;
+  author: FormControl<string>;
+  abstract: FormControl<string>;
+  isbn: FormControl<string>;
+  cover: FormControl<string>;
+}
+
 @Component({
   selector: 'ws-book-new',
   styleUrls: ['./book-new.component.scss'],
@@ -18,7 +27,7 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
   imports: [ReactiveFormsModule, MatFormField, MatInput, NgIf, MatError, MatButton, RouterLink, MatLabel]
 })
 export class BookNewComponent {
-  protected form = this.formBuilder.nonNullable.group({
+  protected form: FormGroup<INewBockForm> = this.formBuilder.nonNullable.group({
     title: ['', [Validators.required]],
     subtitle: [''],
     author: ['', [Validators.required]],
