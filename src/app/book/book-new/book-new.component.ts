@@ -11,6 +11,7 @@ import { MatError, MatFormField } from '@angular/material/form-field';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { INewBookForm } from '../models/formGroup.interface';
 import { MatIconModule } from '@angular/material/icon';
+import { AsyncIsbnValidator, isbnValidator } from './isbn.validator';
 
 @Component({
   selector: 'ws-book-new',
@@ -30,7 +31,7 @@ export class BookNewComponent {
     author: ['', [Validators.required]],
     authors: this.formBuilder.nonNullable.array([new FormControl('', { nonNullable: true })]),
     abstract: [''],
-    isbn: ['', [Validators.required, Validators.minLength(3)]],
+    isbn: ['', [Validators.required, Validators.minLength(3), isbnValidator], [AsyncIsbnValidator()]],
     cover: ['']
   });
 

@@ -5,6 +5,7 @@
     <input matInput formControlName="isbn" placeholder="ISBN" />
     <mat-error *ngIf="form.hasError('minlength', 'isbn')"> ISBN has to be at least 3 characters long. </mat-error>
     <mat-error *ngIf="form.hasError('required', 'isbn')"> ISBN is required </mat-error>
+    <mat-error *ngIf="form.hasError('isbn', 'isbn')"> {{ form.controls.isbn.errors?.['isbn'] }} </mat-error>
   </mat-form-field>
   <mat-form-field>
     <mat-label>Title</mat-label>
