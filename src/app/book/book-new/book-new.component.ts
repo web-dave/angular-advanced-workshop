@@ -10,7 +10,7 @@ import { MatInput, MatLabel } from '@angular/material/input';
 import { MatError, MatFormField } from '@angular/material/form-field';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
-interface INewBockForm {
+interface INewBookForm {
   title: FormControl<string>;
   subtitle: FormControl<string>;
   author: FormControl<string>;
@@ -27,7 +27,7 @@ interface INewBockForm {
   imports: [ReactiveFormsModule, MatFormField, MatInput, NgIf, MatError, MatButton, RouterLink, MatLabel]
 })
 export class BookNewComponent {
-  protected form: FormGroup<INewBockForm> = this.formBuilder.nonNullable.group({
+  protected form: FormGroup<INewBookForm> = this.formBuilder.nonNullable.group({
     title: ['', [Validators.required]],
     subtitle: [''],
     author: ['', [Validators.required]],
