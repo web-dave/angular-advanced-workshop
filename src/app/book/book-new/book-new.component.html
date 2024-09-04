@@ -15,10 +15,18 @@
     <mat-label>Subtitle</mat-label>
     <input matInput formControlName="subtitle" placeholder="Subtitle" />
   </mat-form-field>
-  <mat-form-field>
+  <mat-form-field formArrayName="authors">
     <mat-label>Author</mat-label>
-    <input matInput formControlName="author" placeholder="Author" />
+    @for (author of authors.controls; track author.value) {
+      <input matInput [formControlName]="$index" placeholder="Author" />
+      @if (!$first) {
+        <mat-icon (click)="deleteAuthor($index)" class="add-course-btn">remove</mat-icon>
+      }
+    }
     <mat-error *ngIf="form.hasError('required', 'author')"> Author is required </mat-error>
+    <button type="button" mat-mini-fab (click)="addAuthor()">
+      <mat-icon class="add-course-btn">add</mat-icon>
+    </button>
   </mat-form-field>
   <mat-form-field>
     <mat-label>Abstract</mat-label>
